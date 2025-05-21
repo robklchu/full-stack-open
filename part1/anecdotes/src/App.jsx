@@ -1,5 +1,16 @@
 import { useState } from "react";
 
+const Title = ({ name }) => <h2>{name}</h2>;
+
+const Anecdote = ({ text }) => <div>{text}</div>;
+
+const Count = ({ num }) => {
+  if (num === 1) return <div>has {num} vote</div>;
+  return <div>has {num} votes</div>;
+};
+
+const Button = ({ onClick, text }) => <button onClick={onClick}>{text}</button>;
+
 const App = () => {
   const anecdotes = [
     "If it hurts, do it more often.",
@@ -13,7 +24,8 @@ const App = () => {
   ];
 
   const [selected, setSelected] = useState(0);
-  const [votes, setVotes] = useState({});
+  const [votes, setVotes] = useState(new Array(anecdotes.length).fill(0));
+  const [votingStarted, startVoting] = useState(false);
 
   const selectIndex = () => {
     const randomIndex = Math.floor(Math.random() * anecdotes.length);
@@ -21,21 +33,25 @@ const App = () => {
   };
 
   const incrementVote = () => {
-    const copy = { ...votes };
-    copy[selected] ??= 0;
+    const copy = [...votes];
     copy[selected]++;
     setVotes(copy);
+    startVoting(true);
   };
 
-  const numOfVotes = votes[selected] ?? 0;
+  const mostVote = Math.max(...votes);
+  const mostVoteIndex = votes.indexOf(mostVote);
 
   return (
     <div>
-      <div>{anecdotes[selected]}</div>
-      {numOfVotes === 1 && <div>has {numOfVotes} vote</div>}
-      {numOfVotes !== 1 && <div>has {numOfVotes} votes</div>}
-      <button onClick={incrementVote}>vote</button>
-      <button onClick={selectIndex}>next anecdote</button>
+      <Title name="Anecdote of the day" />
+      <Anecdote text={anecdotes[selected]} />
+      <Count num={votes[selected]} />
+      <Button onClick={incrementVote} text="vote" />
+      <Button onClick={selectIndex} text="next anecdote" />
+      {votingStarted && <Title name="Anecdote with most votes" />}
+      {votingStarted && <Anecdote text={anecdotes[mostVoteIndex]} />}
+      {votingStarted && <Count num={mostVote} />}
     </div>
   );
 };
