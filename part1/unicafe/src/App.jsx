@@ -4,28 +4,26 @@ const Title = ({ name }) => <h2>{name}</h2>;
 
 const Button = ({ onClick, text }) => <button onClick={onClick}>{text}</button>;
 
+const StatisticLine = ({ text, value }) => (
+  <div>
+    {text} {value}
+  </div>
+);
+
 const Statistics = ({ good, neutral, bad }) => {
-  const total = () => good + neutral + bad;
-
-  const average = () => {
-    if (total() === 0) return 0;
-    return (good * 1 + neutral * 0 + bad * -1) / total();
-  };
-
-  const positivePercentage = () => {
-    if (total() === 0) return 0;
-    return (good / total()) * 100 + " %";
-  };
+  const total = good + neutral + bad;
+  const average = (good * 1 + neutral * 0 + bad * -1) / total;
+  const positivePercentage = (good / total) * 100 + " %";
 
   return (
-    <>
-      <div>good {good}</div>
-      <div>neutral {neutral}</div>
-      <div>bad {bad}</div>
-      <div>all {total()}</div>
-      <div>average {average()}</div>
-      <div>positive {positivePercentage()}</div>
-    </>
+    <div>
+      <StatisticLine text="good" value={good} />
+      <StatisticLine text="neutral" value={neutral} />
+      <StatisticLine text="bad" value={bad} />
+      <StatisticLine text="all" value={total} />
+      <StatisticLine text="average" value={average} />
+      <StatisticLine text="positive" value={positivePercentage} />
+    </div>
   );
 };
 
