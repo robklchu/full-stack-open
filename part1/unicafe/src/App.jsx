@@ -39,6 +39,8 @@ const App = () => {
   const incrementNeutral = () => setNeutral(neutral + 1);
   const incrementBad = () => setBad(bad + 1);
 
+  const hasFeedback = good !== 0 || neutral !== 0 || bad !== 0;
+
   return (
     <div>
       <Title name="give feedback" />
@@ -46,7 +48,8 @@ const App = () => {
       <Button onClick={incrementNeutral} text="neutral" />
       <Button onClick={incrementBad} text="bad" />
       <Title name="statistics" />
-      <Statistics good={good} neutral={neutral} bad={bad} />
+      {!hasFeedback && <p>No feedback given</p>}
+      {hasFeedback && <Statistics good={good} neutral={neutral} bad={bad} />}
     </div>
   );
 };
