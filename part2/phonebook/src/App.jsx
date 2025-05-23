@@ -1,5 +1,33 @@
 import { useState } from "react";
 
+const Input = ({ text, handler, value }) => (
+  <div>
+    {text} <input onChange={handler} value={value} />
+  </div>
+);
+
+const SubmitButton = ({ text }) => (
+  <div>
+    <button type="submit">{text}</button>
+  </div>
+);
+
+const Filter = ({ children }) => <>{children}</>;
+
+const PersonForm = ({
+  submitHandler,
+  changeNameHander,
+  changeNumberHandler,
+  name,
+  number,
+}) => (
+  <form onSubmit={submitHandler}>
+    <Input text="name:" handler={changeNameHander} value={name} />
+    <Input text="number:" handler={changeNumberHandler} value={number} />
+    <SubmitButton text="save" />
+  </form>
+);
+
 const Persons = ({ group }) => {
   return (
     <>
@@ -60,22 +88,24 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <div>
-        filter shown with <input onChange={handleQueryChange} value={query} />
-      </div>
-      <h2>add a new</h2>
-      <form onSubmit={addName}>
-        <div>
-          name: <input onChange={handleNameChange} value={newName} />
-        </div>
-        <div>
-          number: <input onChange={handleNumberChange} value={newNumber} />
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
-      <h2>Numbers</h2>
+      <Filter>
+        <Input
+          text="filter shown with"
+          handler={handleQueryChange}
+          value={query}
+        />
+      </Filter>
+
+      <h3>Add a new</h3>
+      <PersonForm
+        submitHandler={addName}
+        changeNameHander={handleNameChange}
+        changeNumberHandler={handleNumberChange}
+        name={newName}
+        number={newNumber}
+      />
+
+      <h3>Numbers</h3>
       {!isFilter && <Persons group={persons} />}
       {isFilter && <Persons group={filteredPersons} />}
     </div>
