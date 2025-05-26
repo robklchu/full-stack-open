@@ -54,7 +54,7 @@ const App = () => {
     axios
       .get("http://localhost:3001/persons")
       .then((res) => setPersons(res.data));
-  };
+  }
 
   const filteredPersons = persons.filter((person) =>
     person.name.toLowerCase().includes(query.toLowerCase())
@@ -83,7 +83,10 @@ const App = () => {
     if (existingNames.includes(newName)) {
       alert(`${newName} is already added to phonebook`);
     } else {
-      setPersons(persons.concat({ name: newName, number: newNumber }));
+      const newContact = { name: newName, number: newNumber };
+      axios
+        .post("http://localhost:3001/persons", newContact)
+        .then((response) => setPersons(persons.concat(response.data)));
     }
     setNewName("");
     setNewNumber("");
