@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import backendServices from "./services/backend";
 
 const Input = ({ text, handler, value }) => (
   <div>
@@ -51,9 +51,9 @@ const App = () => {
   useEffect(fetchPersons, []);
 
   function fetchPersons() {
-    axios
-      .get("http://localhost:3001/persons")
-      .then((res) => setPersons(res.data));
+    backendServices
+      .getAll()
+      .then((initialContacts) => setPersons(initialContacts));
   }
 
   const filteredPersons = persons.filter((person) =>
@@ -84,9 +84,9 @@ const App = () => {
       alert(`${newName} is already added to phonebook`);
     } else {
       const newContact = { name: newName, number: newNumber };
-      axios
-        .post("http://localhost:3001/persons", newContact)
-        .then((response) => setPersons(persons.concat(response.data)));
+      backendServices
+        .create(newContact)
+        .then((p) => setPersons(persons.concat(p)));
     }
     setNewName("");
     setNewNumber("");
