@@ -29,12 +29,13 @@ const PersonForm = ({
   </form>
 );
 
-const Persons = ({ group }) => {
+const Persons = ({ group, deleteHandler }) => {
   return (
     <>
       {group.map((person) => (
         <div key={person.name}>
-          {person.name} {person.number}
+          {person.name} {person.number} &nbsp;
+          <button onClick={() => deleteHandler(person.id)}>delete</button>
         </div>
       ))}
     </>
@@ -92,6 +93,17 @@ const App = () => {
     setNewNumber("");
   };
 
+  const deleteContact = (id) => {
+    const contact = persons.find((p) => p.id === id);
+    alert(`Delete ${contact.name} ?`);
+
+    backendServices
+      .remove(id)
+      .then((removedPerson) =>
+        setPersons(persons.filter((p) => p.id !== removedPerson.id))
+      );
+  };
+
   return (
     <div>
       <h2>Phonebook</h2>
@@ -113,8 +125,10 @@ const App = () => {
       />
 
       <h3>Numbers</h3>
-      {!isFilter && <Persons group={persons} />}
-      {isFilter && <Persons group={filteredPersons} />}
+      {!isFilter && <Persons group={persons} deleteHandler={deleteContact} />}
+      {isFilter && (
+        <Persons group={filteredPersons} deleteHandler={deleteContact} />
+      )}
     </div>
   );
 };
