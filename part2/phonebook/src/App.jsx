@@ -1,46 +1,10 @@
 import { useState, useEffect } from "react";
 import backendServices from "./services/backend";
-
-const Input = ({ text, handler, value }) => (
-  <div>
-    {text} <input onChange={handler} value={value} />
-  </div>
-);
-
-const SubmitButton = ({ text }) => (
-  <div>
-    <button type="submit">{text}</button>
-  </div>
-);
+import Input from "./components/Input";
+import PersonForm from "./components/PersonForm";
+import Persons from "./components/Persons";
 
 const Filter = ({ children }) => <>{children}</>;
-
-const PersonForm = ({
-  submitHandler,
-  changeNameHander,
-  changeNumberHandler,
-  name,
-  number,
-}) => (
-  <form onSubmit={submitHandler}>
-    <Input text="name:" handler={changeNameHander} value={name} />
-    <Input text="number:" handler={changeNumberHandler} value={number} />
-    <SubmitButton text="save" />
-  </form>
-);
-
-const Persons = ({ group, deleteHandler }) => {
-  return (
-    <>
-      {group.map((person) => (
-        <div key={person.name}>
-          {person.name} {person.number} &nbsp;
-          <button onClick={() => deleteHandler(person.id)}>delete</button>
-        </div>
-      ))}
-    </>
-  );
-};
 
 const App = () => {
   const [persons, setPersons] = useState([]);
