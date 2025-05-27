@@ -15,6 +15,7 @@ const App = () => {
   const [query, setQuery] = useState("");
   const [isFilter, setIsFilter] = useState(false);
   const [notification, setNotification] = useState(null);
+  const [errorFlag, setErrorFlag] = useState(false);
 
   useEffect(fetchPersons, []);
 
@@ -58,15 +59,26 @@ const App = () => {
 
       if (reply) {
         const existingPersonId = persons.find((p) => p.name === newName).id;
-        backendServices.update(existingPersonId, newContact).then((contact) => {
-          setPersons(persons.map((p) => (p.id === contact.id ? contact : p)));
-        });
-        setNotification(`Changed ${newName}'s number to ${newNumber}`);
+        backendServices
+          .update(existingPersonId, newContact)
+          .then((contact) => {
+            setPersons(persons.map((p) => (p.id === contact.id ? contact : p)));
+            setErrorFlag(false);
+            setNotification(`Changed ${newName}'s number to ${newNumber}`);
+          })
+          .catch(() => {
+            setErrorFlag(true);
+            setNotification(
+              `Information of ${newName} has already been removed from server`
+            );
+            fetchPersons();
+          });
       }
     } else {
       backendServices
         .create(newContact)
         .then((p) => setPersons(persons.concat(p)));
+      setErrorFlag(false);
       setNotification(`Added ${newName}`);
     }
 
@@ -94,7 +106,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={notification} />
+      <Notification message={notification} isError={errorFlag} />
       <Filter>
         <Input
           text="filter shown with"

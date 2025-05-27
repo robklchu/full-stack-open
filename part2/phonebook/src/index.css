@@ -7,3 +7,8 @@
   background-color: #ccc;
   color: green;
 }
+
+.error {
+  color: red;
+  border-color: red;
+}

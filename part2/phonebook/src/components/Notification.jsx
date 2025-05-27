@@ -1,5 +1,6 @@
-const Notification = ({ message }) => {
-  return message !== null && <div className="notification">{message}</div>;
+const Notification = ({ message, isError }) => {
+  const classes = isError ? "notification error" : "notification";
+  return message !== null && <div className={classes}>{message}</div>;
 };
 
 export default Notification;

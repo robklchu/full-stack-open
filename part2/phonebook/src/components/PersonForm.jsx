@@ -11,7 +11,7 @@ const PersonForm = ({
   <form onSubmit={submitHandler}>
     <Input text="name:" handler={changeNameHander} value={name} />
     <Input text="number:" handler={changeNumberHandler} value={number} />
-    <SubmitButton text="save" />
+    <SubmitButton text="add" />
   </form>
 );
 
