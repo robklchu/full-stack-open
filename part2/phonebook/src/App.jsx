@@ -3,6 +3,8 @@ import backendServices from "./services/backend";
 import Input from "./components/Input";
 import PersonForm from "./components/PersonForm";
 import Persons from "./components/Persons";
+import Notification from "./components/Notification";
+import "./index.css";
 
 const Filter = ({ children }) => <>{children}</>;
 
@@ -12,6 +14,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState("");
   const [query, setQuery] = useState("");
   const [isFilter, setIsFilter] = useState(false);
+  const [notification, setNotification] = useState(null);
 
   useEffect(fetchPersons, []);
 
@@ -41,27 +44,38 @@ const App = () => {
   const addName = (event) => {
     event.preventDefault();
 
+    // Clear filter view
     setIsFilter(false);
     setQuery("");
 
     const existingNames = persons.map((person) => person.name);
+    const newContact = { name: newName, number: newNumber };
+
     if (existingNames.includes(newName)) {
-      alert(
+      const reply = confirm(
         `${newName} is already added to phonebook, replace the old number with a new one?`
       );
-      const existingPersonId = persons.find((p) => p.name === newName).id;
-      const contactToUpdate = { name: newName, number: newNumber };
-      backendServices
-        .update(existingPersonId, contactToUpdate)
-        .then((contact) => {
+
+      if (reply) {
+        const existingPersonId = persons.find((p) => p.name === newName).id;
+        backendServices.update(existingPersonId, newContact).then((contact) => {
           setPersons(persons.map((p) => (p.id === contact.id ? contact : p)));
         });
+        setNotification(`Changed ${newName}'s number to ${newNumber}`);
+      }
     } else {
-      const newContact = { name: newName, number: newNumber };
       backendServices
         .create(newContact)
         .then((p) => setPersons(persons.concat(p)));
+      setNotification(`Added ${newName}`);
     }
+
+    // Clear notification box in 5s
+    setTimeout(() => {
+      setNotification(null);
+    }, 5_000);
+
+    // Clear add new fields
     setNewName("");
     setNewNumber("");
   };
@@ -80,6 +94,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={notification} />
       <Filter>
         <Input
           text="filter shown with"
