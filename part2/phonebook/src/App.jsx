@@ -82,7 +82,16 @@ const App = () => {
 
     const existingNames = persons.map((person) => person.name);
     if (existingNames.includes(newName)) {
-      alert(`${newName} is already added to phonebook`);
+      alert(
+        `${newName} is already added to phonebook, replace the old number with a new one?`
+      );
+      const existingPersonId = persons.find((p) => p.name === newName).id;
+      const contactToUpdate = { name: newName, number: newNumber };
+      backendServices
+        .update(existingPersonId, contactToUpdate)
+        .then((contact) => {
+          setPersons(persons.map((p) => (p.id === contact.id ? contact : p)));
+        });
     } else {
       const newContact = { name: newName, number: newNumber };
       backendServices
