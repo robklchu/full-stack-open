@@ -2,14 +2,22 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import Display from "./components/Display";
 
-export default function App() {
+function App() {
   const [query, setQuery] = useState("");
   const [countries, setCountries] = useState(null);
+  const [showBtnClicked, setShowBtnClicked] = useState(false);
+  const [countryToShow, setCountryToShow] = useState(null);
 
   let matchedCountries;
 
+  function clickShowBtnHandler(country) {
+    setShowBtnClicked(true);
+    setCountryToShow(country);
+  }
+
   function changeHandler(event) {
     setQuery(event.target.value);
+    setShowBtnClicked(false);
   }
 
   function fetchCountries() {
@@ -34,7 +42,16 @@ export default function App() {
   return (
     <div>
       find countries <input onChange={changeHandler} value={query} />
-      {countries && <Display nations={matchedCountries} />}
+      {countries && (
+        <Display
+          nations={matchedCountries}
+          onShowBtnClick={clickShowBtnHandler}
+          showBtnStatus={showBtnClicked}
+          selectedCountry={countryToShow}
+        />
+      )}
     </div>
   );
 }
+
+export default App;
