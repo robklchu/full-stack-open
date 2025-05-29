@@ -1,25 +1,4 @@
-function Nation({ nation }) {
-  const countryName = nation.name.common;
-  const capital = nation.capital[0];
-  const area = nation.area;
-  const languages = Object.values(nation.languages);
-  const flag = nation.flags;
-
-  return (
-    <div>
-      <h1>{countryName}</h1>
-      <div>Capital {capital}</div>
-      <div>Area {area}</div>
-      <h2>Languages</h2>
-      <ul>
-        {languages.map((lang) => (
-          <li key={lang}>{lang}</li>
-        ))}
-      </ul>
-      <img src={flag.png} alt={flag.alt} />
-    </div>
-  );
-}
+import Nation from "./Nation";
 
 function Display({ nations, onShowBtnClick, showBtnStatus, selectedCountry }) {
   if (nations.length === 0) {
