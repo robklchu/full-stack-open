@@ -1,6 +1,9 @@
 const express = require("express");
+const morgan = require("morgan");
+
 const app = express();
 
+app.use(morgan("tiny")); 
 app.use(express.json());
 
 let persons = [
@@ -69,7 +72,7 @@ app.post("/api/persons", (req, res) => {
   if (persons.find((p) => p.name === body.name)) {
     return res.status(400).json({ error: "name must be unique" });
   }
-  
+
   const person = {
     name: body.name,
     number: body.number,
