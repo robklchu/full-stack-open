@@ -7,4 +7,42 @@ Content-Type: application/json
 }
 
 ###
-GET http://localhost:3001/api/persons/
+# Error case #1: name field is empty
+POST http://localhost:3001/api/persons/
+Content-Type: application/json
+
+{
+    "name": "",
+    "number": "7823-237827"
+}
+
+###
+# Error case #2: number field is empty
+POST http://localhost:3001/api/persons/
+Content-Type: application/json
+
+{
+    "name": "Albert Ford",
+    "number": ""
+}
+
+###
+# Error case #3: both fields are empty
+POST http://localhost:3001/api/persons/
+Content-Type: application/json
+
+{
+    "name": "",
+    "number": ""
+}
+
+###
+# Error case #4: name is not unique
+POST http://localhost:3001/api/persons/
+Content-Type: application/json
+
+{
+    "name": "Albert Ford",
+    "number": "1234325435"
+}
+
