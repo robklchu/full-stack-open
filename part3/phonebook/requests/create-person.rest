@@ -1,4 +1,4 @@
-POST http://localhost:3001/api/persons/
+POST https://backend-pbc3.onrender.com/api/persons
 Content-Type: application/json
 
 {
@@ -8,7 +8,7 @@ Content-Type: application/json
 
 ###
 # Error case #1: name field is empty
-POST http://localhost:3001/api/persons/
+POST https://backend-pbc3.onrender.com/api/persons
 Content-Type: application/json
 
 {
@@ -18,7 +18,7 @@ Content-Type: application/json
 
 ###
 # Error case #2: number field is empty
-POST http://localhost:3001/api/persons/
+POST https://backend-pbc3.onrender.com/api/persons
 Content-Type: application/json
 
 {
@@ -28,7 +28,7 @@ Content-Type: application/json
 
 ###
 # Error case #3: both fields are empty
-POST http://localhost:3001/api/persons/
+POST https://backend-pbc3.onrender.com/api/persons
 Content-Type: application/json
 
 {
@@ -38,7 +38,7 @@ Content-Type: application/json
 
 ###
 # Error case #4: name is not unique
-POST http://localhost:3001/api/persons/
+POST https://backend-pbc3.onrender.com/api/persons
 Content-Type: application/json
 
 {
