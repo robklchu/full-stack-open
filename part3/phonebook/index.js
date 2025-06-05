@@ -1,9 +1,8 @@
 const express = require("express");
 const morgan = require("morgan");
-const cors = require("cors");
 
 const app = express();
-app.use(cors());
+app.use(express.static('dist')); // to serve static files in 'dist'
 
 morgan.token("data", function (req, res) {
   return JSON.stringify(req.body);
@@ -92,7 +91,7 @@ app.post("/api/persons", (req, res) => {
   res.json(person);
 });
 
-const PORT = 3001;
+const PORT = process.env.PORT || 3001; // allow for external hosting
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
