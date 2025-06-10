@@ -59,18 +59,23 @@ app.get("/api/persons", (req, res) => {
 app.get("/api/persons/:id", (req, res) => {
   Person.findById(req.params.id)
     .then((person) => {
-      res.json(person);
+      if (person) {
+        res.json(person);
+      } else {
+        res.status(404).end();
+      }
     })
     .catch((error) => {
-      res.status(404).end();
+      // CastError: failing to cast id from String to ObjectId type
+      console.log(error);
+      res.status(400).send({ error: "malformatted id" });
     });
 });
 
 app.delete("/api/persons/:id", (req, res) => {
-  const id = req.params.id;
-  persons = persons.filter((p) => p.id !== id);
-
-  res.status(204).end();
+  Person.findByIdAndDelete(req.params.id).then((result) => {
+    res.status(204).end();
+  });
 });
 
 app.post("/api/persons", (req, res) => {

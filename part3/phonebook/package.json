@@ -6,7 +6,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
     "dev": "node --watch index.js",
-    "build:ui": "rm -rf dist && cd ../../part2/phonebook && npm run build && cp -r dist ../../part3/phonebook"
+    "build:ui": "rm -rf dist && cd ../../part2/phonebook && npm run build && cp -r dist ../../part3/phonebook",
+    "remote:ui": "rsync -av --progress . ../../../backend/ --exclude node_modules --exclude requests --exclude .git --exclude mongo.js --exclude package-lock.json"
   },
   "keywords": [],
   "author": "",
