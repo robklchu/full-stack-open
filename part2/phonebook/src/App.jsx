@@ -96,11 +96,7 @@ const App = () => {
     const contact = persons.find((p) => p.id === id);
     alert(`Delete ${contact.name} ?`);
 
-    backendServices
-      .remove(id)
-      .then((removedPerson) =>
-        setPersons(persons.filter((p) => p.id !== removedPerson.id))
-      );
+    backendServices.remove(id).then(fetchPersons);
   };
 
   return (
