@@ -39,6 +39,17 @@ let persons = [
   // },
 ];
 
+const errorHandler = (err, req, res, next) => {
+  console.error(err.message);
+
+  if (err.name === "CastError") {
+    return res.status(400).send({ error: "malformatted id" });
+  }
+
+  // Pass other error to the default Express error handler
+  next(err);
+};
+
 app.get("/", (req, res) => {
   res.send("<h1>Phonebook</h1>");
 });
@@ -56,7 +67,7 @@ app.get("/api/persons", (req, res) => {
   });
 });
 
-app.get("/api/persons/:id", (req, res) => {
+app.get("/api/persons/:id", (req, res, next) => {
   Person.findById(req.params.id)
     .then((person) => {
       if (person) {
@@ -65,17 +76,15 @@ app.get("/api/persons/:id", (req, res) => {
         res.status(404).end();
       }
     })
-    .catch((error) => {
-      // CastError: failing to cast id from String to ObjectId type
-      console.log(error);
-      res.status(400).send({ error: "malformatted id" });
-    });
+    .catch((err) => next(err));
 });
 
-app.delete("/api/persons/:id", (req, res) => {
-  Person.findByIdAndDelete(req.params.id).then((result) => {
-    res.status(204).end();
-  });
+app.delete("/api/persons/:id", (req, res, next) => {
+  Person.findByIdAndDelete(req.params.id)
+    .then((result) => {
+      res.status(204).end();
+    })
+    .catch((err) => next(err));
 });
 
 app.post("/api/persons", (req, res) => {
@@ -101,6 +110,8 @@ app.post("/api/persons", (req, res) => {
     res.json(savedPerson);
   });
 });
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
