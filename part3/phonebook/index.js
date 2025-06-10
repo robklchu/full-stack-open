@@ -16,29 +16,6 @@ app.use(
 
 app.use(express.json());
 
-let persons = [
-  // {
-  //   id: "1",
-  //   name: "Arto Hellas",
-  //   number: "040-123456",
-  // },
-  // {
-  //   id: "2",
-  //   name: "Ada Lovelace",
-  //   number: "39-44-5323523",
-  // },
-  // {
-  //   id: "3",
-  //   name: "Dan Abramov",
-  //   number: "12-43-234345",
-  // },
-  // {
-  //   id: "4",
-  //   name: "Mary Poppendieck",
-  //   number: "39-23-6423122",
-  // },
-];
-
 const errorHandler = (err, req, res, next) => {
   console.error(err.message);
 
@@ -55,10 +32,12 @@ app.get("/", (req, res) => {
 });
 
 app.get("/info", (req, res) => {
-  res.send(
-    `<p>Phonebook has info for ${persons.length} people</p>
-    <p>${new Date().toString()}</p>`
-  );
+  Person.find({}).then((persons) => {
+    res.send(
+      `<p>Phonebook has info for ${persons.length} people</p>
+      <p>${new Date().toString()}</p>`
+    );
+  });
 });
 
 app.get("/api/persons", (req, res) => {
@@ -93,13 +72,6 @@ app.post("/api/persons", (req, res) => {
   if (!body.name || !body.number) {
     return res.status(400).json({ error: "name or number is missing" });
   }
-
-  ///////////////////////////////
-  // To be updated
-  if (persons.find((p) => p.name === body.name)) {
-    return res.status(400).json({ error: "name must be unique" });
-  }
-  ///////////////////////////////
 
   const person = new Person({
     name: body.name,
