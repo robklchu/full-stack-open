@@ -6,7 +6,7 @@ const Person = require("./models/person");
 const app = express();
 app.use(express.static("dist")); // to serve static files in 'dist'
 
-morgan.token("data", function (req, res) {
+morgan.token("data", function (req) {
   return JSON.stringify(req.body);
 });
 
@@ -63,7 +63,7 @@ app.get("/api/persons/:id", (req, res, next) => {
 
 app.delete("/api/persons/:id", (req, res, next) => {
   Person.findByIdAndDelete(req.params.id)
-    .then((result) => {
+    .then(() => {
       res.status(204).end();
     })
     .catch((err) => next(err));

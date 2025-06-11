@@ -6,6 +6,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
     "dev": "node --watch index.js",
+    "lint": "eslint .",
     "build:ui": "rm -rf dist && cd ../../part2/phonebook && npm run build && cp -r dist ../../part3/phonebook",
     "remote:ui": "rsync -av --progress . ../../../backend/ --exclude node_modules --exclude requests --exclude .git --exclude mongo.js --exclude package-lock.json"
   },
@@ -18,5 +19,11 @@
     "express": "^5.1.0",
     "mongoose": "^8.15.1",
     "morgan": "^1.10.0"
+  },
+    "devDependencies": {
+    "@eslint/js": "^9.28.0",
+    "@stylistic/eslint-plugin": "^4.4.1",
+    "eslint": "^9.28.0",
+    "globals": "^16.2.0"
   }
 }
