@@ -77,9 +77,17 @@ const App = () => {
     } else {
       backendServices
         .create(newContact)
-        .then((p) => setPersons(persons.concat(p)));
-      setErrorFlag(false);
-      setNotification(`Added ${newName}`);
+        .then((p) => {
+          setPersons(persons.concat(p));
+          setErrorFlag(false);
+          setNotification(`Added ${newName}`);
+        })
+        .catch((err) => {
+          const message = err.response.data.error;
+          console.log(message);
+          setErrorFlag(true);
+          setNotification(message);
+        });
     }
 
     // Clear notification box in 5s
