@@ -25,6 +25,12 @@ const App = () => {
       .then((initialContacts) => setPersons(initialContacts));
   }
 
+  function handleInputError(err) {
+    const message = err.response.data.error;
+    setErrorFlag(true);
+    setNotification(message);
+  }
+
   const filteredPersons = persons.filter((person) =>
     person.name.toLowerCase().includes(query.toLowerCase())
   );
@@ -66,13 +72,7 @@ const App = () => {
             setErrorFlag(false);
             setNotification(`Changed ${newName}'s number to ${newNumber}`);
           })
-          .catch(() => {
-            setErrorFlag(true);
-            setNotification(
-              `Information of ${newName} has already been removed from server`
-            );
-            fetchPersons();
-          });
+          .catch(handleInputError);
       }
     } else {
       backendServices
@@ -82,12 +82,7 @@ const App = () => {
           setErrorFlag(false);
           setNotification(`Added ${newName}`);
         })
-        .catch((err) => {
-          const message = err.response.data.error;
-          console.log(message);
-          setErrorFlag(true);
-          setNotification(message);
-        });
+        .catch(handleInputError);
     }
 
     // Clear notification box in 5s
