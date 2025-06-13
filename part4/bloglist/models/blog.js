@@ -1,6 +1,4 @@
 const mongoose = require("mongoose");
-const logger = require("../utils/logger");
-const config = require("../utils/config");
 
 const blogSchema = mongoose.Schema({
   title: String,
@@ -10,12 +8,5 @@ const blogSchema = mongoose.Schema({
 });
 
 const Blog = mongoose.model("Blog", blogSchema);
-
-const mongoUrl = config.MONGODB_URI;
-
-mongoose
-  .connect(mongoUrl)
-  .then(logger.info("connected to MongoDB"))
-  .catch((err) => logger.error("error connection to MongoDB:", err.message));
 
 module.exports = Blog;
