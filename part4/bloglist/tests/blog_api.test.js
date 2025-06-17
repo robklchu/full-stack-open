@@ -42,6 +42,31 @@ describe("BlogList API", () => {
     assert.strictEqual(blogId, dbDocId);
   });
 
+  test("POST request creates a new blog post", async () => {
+    const newBlogPost = {
+      title: "How to be happy",
+      author: "Romano Lovebird",
+      url: "http://romano.lovebird.com/how-to-be-happy",
+      likes: 33,
+    };
+
+    let response = await api.get("/api/blogs");
+    let newBlog = response.body.filter((b) => b.title === "How to be happy");
+    assert(newBlog.length === 0);
+
+    await api
+      .post("/api/blogs")
+      .send(newBlogPost)
+      .expect(201)
+      .expect("Content-Type", /json/);
+
+    response = await api.get("/api/blogs");
+    assert.strictEqual(response.body.length, initialBlogs.length + 1);
+
+    newBlog = response.body.filter((b) => b.title === "How to be happy");
+    assert(newBlog.length === 1);
+  });
+
   after(async () => {
     await mongoose.connection.close();
   });
