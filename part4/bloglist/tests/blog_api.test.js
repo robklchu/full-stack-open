@@ -67,6 +67,22 @@ describe("BlogList API", () => {
     assert(newBlog.length === 1);
   });
 
+  test("likes property default to 0 if missing from a request", async () => {
+    const newBlogPost = {
+      title: "How to be happy",
+      author: "Romano Lovebird",
+      url: "http://romano.lovebird.com/how-to-be-happy",
+    };
+
+    const response = await api
+      .post("/api/blogs")
+      .send(newBlogPost)
+      .expect(201)
+      .expect("Content-Type", /json/);
+
+    assert.strictEqual(response.body.likes, 0);
+  });
+
   after(async () => {
     await mongoose.connection.close();
   });
