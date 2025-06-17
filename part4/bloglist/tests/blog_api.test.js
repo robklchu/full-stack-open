@@ -83,6 +83,26 @@ describe("BlogList API", () => {
     assert.strictEqual(response.body.likes, 0);
   });
 
+  test("returns status 400 if title property is missing from a request", async () => {
+    const newBlogPost = {
+      author: "Romano Lovebird",
+      url: "http://romano.lovebird.com/how-to-be-happy",
+      likes: 33,
+    };
+
+    await api.post("/api/blogs").send(newBlogPost).expect(400);
+  });
+
+  test("returns status 400 if url property is missing from a request", async () => {
+    const newBlogPost = {
+      title: "How to be happy",
+      author: "Romano Lovebird",
+      likes: 33,
+    };
+
+    await api.post("/api/blogs").send(newBlogPost).expect(400);
+  });
+
   after(async () => {
     await mongoose.connection.close();
   });
