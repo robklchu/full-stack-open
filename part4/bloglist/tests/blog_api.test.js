@@ -27,6 +27,21 @@ describe("BlogList API", () => {
     assert.strictEqual(response.body.length, initialBlogs.length);
   });
 
+  test("unique identifier property of blog posts is named 'id'", async () => {
+    await Blog.deleteMany({});
+
+    const blog = new Blog(initialBlogs[0]);
+    await blog.save();
+
+    const dbDoc = await Blog.find({});
+    const dbDocId = dbDoc[0]._id.toString();
+
+    const response = await api.get("/api/blogs");
+    const blogId = response.body[0].id;
+
+    assert.strictEqual(blogId, dbDocId);
+  });
+
   after(async () => {
     await mongoose.connection.close();
   });
