@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "node --test",
-    "dev": "node --watch index.js"
+    "test": "NODE_ENV=test node --test",
+    "dev": "NODE_ENV=development node --watch index.js"
   },
   "keywords": [],
   "author": "",
@@ -15,5 +15,8 @@
     "express": "^5.1.0",
     "lodash": "^4.17.21",
     "mongoose": "^8.15.2"
+  },
+  "devDependencies": {
+    "supertest": "^7.1.1"
   }
 }
