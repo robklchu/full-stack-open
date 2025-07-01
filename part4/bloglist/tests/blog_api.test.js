@@ -96,7 +96,7 @@ describe("BlogList API", () => {
     await api.post("/api/blogs").send(newBlogPost).expect(400);
   });
 
-  describe.only("deleting a blog post", () => {
+  describe("deleting a blog post", () => {
     test("succeeds with status code 204 if id is valid", async () => {
       const blogsAtStart = await blogsInDb();
       const blogToDelete = blogsAtStart[0];
@@ -120,6 +120,38 @@ describe("BlogList API", () => {
       const blogsAtEnd = await blogsInDb();
       assert.strictEqual(blogsAtEnd.length, blogsAtStart.length);
       assert.strictEqual(response.body.message, "Blog not found");
+    });
+  });
+
+  describe("updating a blog post", () => {
+    test("succeeds in updating the number of likes", async () => {
+      const blogsAtStart = await blogsInDb();
+      const updatedBlog = {
+        ...blogsAtStart[0],
+        likes: blogsAtStart[0].likes + 1,
+      };
+
+      await api.put(`/api/blogs/${blogsAtStart[0].id}`).send(updatedBlog);
+
+      const response = await api.get("/api/blogs");
+      const blog = response.body.find((b) => b.id === updatedBlog.id);
+
+      assert.strictEqual(blog.likes, blogsAtStart[0].likes + 1);
+    });
+
+    test("fails with status code 404 if id is invalid", async () => {
+      const blogsAtStart = await blogsInDb();
+      const invalidBlogId = "5a422bc61b54a676234d17ff";
+      const invalidBlog = {
+        ...blogsAtStart[0],
+        likes: blogsAtStart[0].likes + 1,
+        id: invalidBlogId,
+      };
+
+      await api
+        .put(`/api/blogs/${invalidBlog.id}`)
+        .send(invalidBlog)
+        .expect(404);
     });
   });
 
