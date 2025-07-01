@@ -4,17 +4,14 @@ const mongoose = require("mongoose");
 const Blog = require("../models/blog");
 const app = require("../app");
 const supertest = require("supertest");
-const { initialBlogs } = require("./api_test_data");
+const { initialBlogs, blogsInDb } = require("./test_helper");
 
 const api = supertest(app);
 
 describe("BlogList API", () => {
   beforeEach(async () => {
     await Blog.deleteMany({});
-
-    const blogObjects = initialBlogs.map((blog) => new Blog(blog));
-    const promiseArray = blogObjects.map((blog) => blog.save());
-    await Promise.all(promiseArray);
+    await Blog.insertMany(initialBlogs);
   });
 
   test("GET request returns blog posts in JSON format", async () => {
@@ -28,18 +25,15 @@ describe("BlogList API", () => {
   });
 
   test("unique identifier property of blog posts is named 'id'", async () => {
-    await Blog.deleteMany({});
+    const testId = initialBlogs[0]._id;
 
-    const blog = new Blog(initialBlogs[0]);
-    await blog.save();
-
-    const dbDoc = await Blog.find({});
-    const dbDocId = dbDoc[0]._id.toString();
+    const dbDoc = await Blog.findById(testId);
+    const dbDocId = dbDoc._id.toString();
 
     const response = await api.get("/api/blogs");
-    const blogId = response.body[0].id;
+    const blog = response.body.find((b) => b.id === testId);
 
-    assert.strictEqual(blogId, dbDocId);
+    assert.strictEqual(blog.id, dbDocId);
   });
 
   test("POST request creates a new blog post", async () => {
@@ -50,9 +44,7 @@ describe("BlogList API", () => {
       likes: 33,
     };
 
-    let response = await api.get("/api/blogs");
-    let newBlog = response.body.filter((b) => b.title === "How to be happy");
-    assert(newBlog.length === 0);
+    const blogsAtStart = await blogsInDb();
 
     await api
       .post("/api/blogs")
@@ -60,11 +52,12 @@ describe("BlogList API", () => {
       .expect(201)
       .expect("Content-Type", /json/);
 
-    response = await api.get("/api/blogs");
-    assert.strictEqual(response.body.length, initialBlogs.length + 1);
+    const blogsAtEnd = await blogsInDb();
 
-    newBlog = response.body.filter((b) => b.title === "How to be happy");
-    assert(newBlog.length === 1);
+    assert.strictEqual(blogsAtEnd.length, blogsAtStart.length + 1);
+
+    const blogsTitleAtEnd = blogsAtEnd.map((b) => b.title);
+    assert(blogsTitleAtEnd.includes("How to be happy"));
   });
 
   test("likes property default to 0 if missing from a request", async () => {
@@ -101,6 +94,33 @@ describe("BlogList API", () => {
     };
 
     await api.post("/api/blogs").send(newBlogPost).expect(400);
+  });
+
+  describe.only("deleting a blog post", () => {
+    test("succeeds with status code 204 if id is valid", async () => {
+      const blogsAtStart = await blogsInDb();
+      const blogToDelete = blogsAtStart[0];
+
+      await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204);
+
+      const blogsAtEnd = await blogsInDb();
+      assert.strictEqual(blogsAtEnd.length, blogsAtStart.length - 1);
+
+      const titles = blogsAtEnd.map((b) => b.title);
+      assert(!titles.includes(blogToDelete.title));
+    });
+
+    test("fails with status code 404 if id is invalid", async () => {
+      const blogsAtStart = await blogsInDb();
+      const invalidBlogId = "5a422bc61b54a676234d17ff";
+      const response = await api
+        .delete(`/api/blogs/${invalidBlogId}`)
+        .expect(404);
+
+      const blogsAtEnd = await blogsInDb();
+      assert.strictEqual(blogsAtEnd.length, blogsAtStart.length);
+      assert.strictEqual(response.body.message, "Blog not found");
+    });
   });
 
   after(async () => {
