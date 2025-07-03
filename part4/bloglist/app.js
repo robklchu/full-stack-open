@@ -4,6 +4,7 @@ const blogRouter = require("./controllers/blogs");
 const userRouter = require("./controllers/users");
 const config = require("./utils/config");
 const logger = require("./utils/logger");
+const middleware = require("./utils/middleware");
 
 // connect to database
 const mongoUrl = config.MONGODB_URI;
@@ -17,5 +18,6 @@ const app = express();
 app.use(express.json());
 app.use("/api/blogs", blogRouter);
 app.use("/api/users", userRouter);
+app.use(middleware.errorHandler);
 
 module.exports = app;

@@ -1,9 +1,9 @@
 function info(...params) {
-  return console.log(...params);
+  console.log(...params);
 }
 
 function error(...params) {
-  return console.error(...params);
+  console.error(...params);
 }
 
 module.exports = { info, error };
