@@ -17,7 +17,8 @@ mongoose
 // connect to middleware
 const app = express();
 app.use(express.json());
-app.use("/api/login", loginRouter)
+app.use(middleware.tokenExtractor);
+app.use("/api/login", loginRouter);
 app.use("/api/blogs", blogRouter);
 app.use("/api/users", userRouter);
 app.use(middleware.errorHandler);
