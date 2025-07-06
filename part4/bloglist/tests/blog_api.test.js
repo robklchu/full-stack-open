@@ -2,98 +2,152 @@ const { test, after, beforeEach, describe } = require("node:test");
 const assert = require("node:assert");
 const mongoose = require("mongoose");
 const Blog = require("../models/blog");
+const User = require("../models/user");
 const app = require("../app");
 const supertest = require("supertest");
 const { initialBlogs, blogsInDb } = require("./test_helper");
 
 const api = supertest(app);
 
-describe("BlogList API", () => {
+describe("BlogList API", async () => {
+  await User.deleteMany({});
+
+  const creator = {
+    username: "robertchu",
+    name: "Robert Chu",
+    password: "hehehaha",
+  };
+
+  await api.post("/api/users").send(creator);
+  const response = await api.post("/api/login").send(creator);
+  const token = response.body.token;
+
   beforeEach(async () => {
     await Blog.deleteMany({});
+
+    const users = await User.find({});
+    for (let user of users) {
+      user.blogs = [];
+      await user.save();
+    }
+
     await Blog.insertMany(initialBlogs);
+    const blogs = await Blog.find({});
+    for (let blog of blogs) {
+      await api.get(`/api/blogs/${blog._id.toString()}`);
+    }
   });
 
-  test("GET request returns blog posts in JSON format", async () => {
-    await api.get("/api/blogs").expect(200).expect("Content-Type", /json/);
+  describe("retrieving blog posts", () => {
+    test("GET request returns blog posts in JSON format", async () => {
+      await api.get("/api/blogs").expect(200).expect("Content-Type", /json/);
+    });
+
+    test("GET request returns correct amount of blog posts", async () => {
+      const response = await api.get("/api/blogs");
+
+      assert.strictEqual(response.body.length, initialBlogs.length);
+    });
+
+    test("unique identifier property of blog posts is named 'id'", async () => {
+      const testId = initialBlogs[0]._id;
+
+      const dbDoc = await Blog.findById(testId);
+      const dbDocId = dbDoc._id.toString();
+
+      const response = await api.get("/api/blogs");
+      const blog = response.body.find((b) => b.id === testId);
+
+      assert.strictEqual(blog.id, dbDocId);
+    });
   });
 
-  test("GET request returns correct amount of blog posts", async () => {
-    const response = await api.get("/api/blogs");
+  describe("adding a blog post", () => {
+    test("POST request creates a new blog post", async () => {
+      const newBlogPost = {
+        title: "How to be happy",
+        author: "Romano Lovebird",
+        url: "http://romano.lovebird.com/how-to-be-happy",
+        likes: 33,
+      };
 
-    assert.strictEqual(response.body.length, initialBlogs.length);
-  });
+      const blogsAtStart = await blogsInDb();
 
-  test("unique identifier property of blog posts is named 'id'", async () => {
-    const testId = initialBlogs[0]._id;
+      await api
+        .post("/api/blogs")
+        .set("Authorization", `Bearer ${token}`)
+        .send(newBlogPost)
+        .expect(201)
+        .expect("Content-Type", /json/);
 
-    const dbDoc = await Blog.findById(testId);
-    const dbDocId = dbDoc._id.toString();
+      const blogsAtEnd = await blogsInDb();
 
-    const response = await api.get("/api/blogs");
-    const blog = response.body.find((b) => b.id === testId);
+      assert.strictEqual(blogsAtEnd.length, blogsAtStart.length + 1);
 
-    assert.strictEqual(blog.id, dbDocId);
-  });
+      const blogsTitleAtEnd = blogsAtEnd.map((b) => b.title);
+      assert(blogsTitleAtEnd.includes("How to be happy"));
+    });
 
-  test("POST request creates a new blog post", async () => {
-    const newBlogPost = {
-      title: "How to be happy",
-      author: "Romano Lovebird",
-      url: "http://romano.lovebird.com/how-to-be-happy",
-      likes: 33,
-    };
+    test("likes property default to 0 if missing from a request", async () => {
+      const newBlogPost = {
+        title: "How to be happy",
+        author: "Romano Lovebird",
+        url: "http://romano.lovebird.com/how-to-be-happy",
+      };
 
-    const blogsAtStart = await blogsInDb();
+      const response = await api
+        .post("/api/blogs")
+        .set("Authorization", `Bearer ${token}`)
+        .send(newBlogPost)
+        .expect(201)
+        .expect("Content-Type", /json/);
 
-    await api
-      .post("/api/blogs")
-      .send(newBlogPost)
-      .expect(201)
-      .expect("Content-Type", /json/);
+      assert.strictEqual(response.body.likes, 0);
+    });
 
-    const blogsAtEnd = await blogsInDb();
+    test("fails with status 400 if title property is missing", async () => {
+      const newBlogPost = {
+        author: "Romano Lovebird",
+        url: "http://romano.lovebird.com/how-to-be-happy",
+        likes: 33,
+      };
 
-    assert.strictEqual(blogsAtEnd.length, blogsAtStart.length + 1);
+      await api
+        .post("/api/blogs")
+        .set("Authorization", `Bearer ${token}`)
+        .send(newBlogPost)
+        .expect(400);
+    });
 
-    const blogsTitleAtEnd = blogsAtEnd.map((b) => b.title);
-    assert(blogsTitleAtEnd.includes("How to be happy"));
-  });
+    test("fails with status 400 if url property is missing", async () => {
+      const newBlogPost = {
+        title: "How to be happy",
+        author: "Romano Lovebird",
+        likes: 33,
+      };
 
-  test("likes property default to 0 if missing from a request", async () => {
-    const newBlogPost = {
-      title: "How to be happy",
-      author: "Romano Lovebird",
-      url: "http://romano.lovebird.com/how-to-be-happy",
-    };
+      await api
+        .post("/api/blogs")
+        .set("Authorization", `Bearer ${token}`)
+        .send(newBlogPost)
+        .expect(400);
+    });
 
-    const response = await api
-      .post("/api/blogs")
-      .send(newBlogPost)
-      .expect(201)
-      .expect("Content-Type", /json/);
+    test("fails with status 401 if token is not provided", async () => {
+      const newBlogPost = {
+        title: "How to be happy",
+        author: "Romano Lovebird",
+        url: "http://romano.lovebird.com/how-to-be-happy",
+        likes: 33,
+      };
 
-    assert.strictEqual(response.body.likes, 0);
-  });
-
-  test("returns status 400 if title property is missing from a request", async () => {
-    const newBlogPost = {
-      author: "Romano Lovebird",
-      url: "http://romano.lovebird.com/how-to-be-happy",
-      likes: 33,
-    };
-
-    await api.post("/api/blogs").send(newBlogPost).expect(400);
-  });
-
-  test("returns status 400 if url property is missing from a request", async () => {
-    const newBlogPost = {
-      title: "How to be happy",
-      author: "Romano Lovebird",
-      likes: 33,
-    };
-
-    await api.post("/api/blogs").send(newBlogPost).expect(400);
+      await api
+        .post("/api/blogs")
+        .set("Authorization", `Bearer `)
+        .send(newBlogPost)
+        .expect(401)
+        .expect("Content-Type", /json/);
+    });
   });
 
   describe("deleting a blog post", () => {
@@ -101,7 +155,10 @@ describe("BlogList API", () => {
       const blogsAtStart = await blogsInDb();
       const blogToDelete = blogsAtStart[0];
 
-      await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204);
+      await api
+        .delete(`/api/blogs/${blogToDelete.id}`)
+        .set("Authorization", `Bearer ${token}`)
+        .expect(204);
 
       const blogsAtEnd = await blogsInDb();
       assert.strictEqual(blogsAtEnd.length, blogsAtStart.length - 1);
@@ -115,11 +172,12 @@ describe("BlogList API", () => {
       const invalidBlogId = "5a422bc61b54a676234d17ff";
       const response = await api
         .delete(`/api/blogs/${invalidBlogId}`)
+        .set("Authorization", `Bearer ${token}`)
         .expect(404);
 
       const blogsAtEnd = await blogsInDb();
       assert.strictEqual(blogsAtEnd.length, blogsAtStart.length);
-      assert.strictEqual(response.body.message, "Blog not found");
+      assert.strictEqual(response.body.error, "blog not found");
     });
   });
 
