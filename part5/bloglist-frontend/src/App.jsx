@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Blog from "./components/Blog";
+import Notification from "./components/Notification";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
 
@@ -7,7 +8,8 @@ const App = () => {
   const [user, setUser] = useState(null);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [errorMessage, setErrorMessage] = useState(null);
+  const [isError, setIsError] = useState(false);
+  const [message, setMessage] = useState(null);
   const [blogs, setBlogs] = useState([]);
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
@@ -18,6 +20,7 @@ const App = () => {
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON);
       setUser(user);
+      blogService.setToken(user.token); // otherwise user.token is erased upon refresh
     }
   }, []);
 
@@ -36,9 +39,11 @@ const App = () => {
       blogService.setToken(user.token);
       setUser(user);
     } catch (exception) {
-      setErrorMessage("Wrong credentials");
+      setIsError(true);
+      setMessage("Wrong username or password");
       setTimeout(() => {
-        setErrorMessage(null);
+        setIsError(false);
+        setMessage(null);
       }, 5000);
     } finally {
       setUsername("");
@@ -126,13 +131,16 @@ const App = () => {
         author,
         url,
       });
+      setMessage(`a new blog ${newBlog.title} added`);
       setBlogs(blogs.concat(newBlog));
     } catch (exception) {
-      setErrorMessage("Missing title or url");
-      setTimeout(() => {
-        setErrorMessage(null);
-      }, 5000);
+      setIsError(true);
+      setMessage("Missing title or url");
     } finally {
+      setTimeout(() => {
+        setIsError(false);
+        setMessage(null);
+      }, 5000);
       setTitle("");
       setAuthor("");
       setUrl("");
@@ -142,8 +150,8 @@ const App = () => {
   if (user === null) {
     return (
       <div>
-        <p style={{ color: "red" }}>{errorMessage}</p>
         <h2>log in to application</h2>
+        <Notification message={message} isError={isError} />
         {loginForm()}
       </div>
     );
@@ -152,13 +160,13 @@ const App = () => {
   return (
     <div>
       <h2>blogs</h2>
+      <Notification message={message} isError={isError} />
       <p>
         {user.name} logged in
         <button type="submit" onClick={handleLogout}>
           logout
         </button>
       </p>
-      <p style={{ color: "red" }}>{errorMessage}</p>
       <h2>create new</h2>
       {blogForm()}
       {blogs.map((blog) => (
