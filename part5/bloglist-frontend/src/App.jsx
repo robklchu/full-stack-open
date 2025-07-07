@@ -10,13 +10,13 @@ const App = () => {
   const [errorMessage, setErrorMessage] = useState(null);
   const [blogs, setBlogs] = useState([]);
 
-  // useEffect(() => {
-  //   const loggedUserJSON = window.localStorage.getItem("loggedBlogappUser");
-  //   if (loggedUserJSON) {
-  //     const user = JSON.parse(loggedBlogappUser);
-  //     setUser(user);
-  //   }
-  // }, []);
+  useEffect(() => {
+    const loggedUserJSON = window.localStorage.getItem("loggedBlogappUser");
+    if (loggedUserJSON) {
+      const user = JSON.parse(loggedUserJSON);
+      setUser(user);
+    }
+  }, []);
 
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs));
@@ -30,7 +30,7 @@ const App = () => {
         password,
       });
 
-      // window.localStorage.setItem("loggedBlogappUser", JSON.stringify(user));
+      window.localStorage.setItem("loggedBlogappUser", JSON.stringify(user));
 
       setUser(user);
     } catch (exception) {
@@ -42,6 +42,11 @@ const App = () => {
       setUsername("");
       setPassword("");
     }
+  }
+
+  function handleLogout(event) {
+    window.localStorage.removeItem("loggedBlogappUser");
+    setUser(null);
   }
 
   function loginForm() {
@@ -85,7 +90,10 @@ const App = () => {
   return (
     <div>
       <h2>blogs</h2>
-      <p>{user.name} logged in</p>
+      <p>
+        {user.name} logged in
+        <button type="submit" onClick={handleLogout}>logout</button>
+      </p>
       {blogs.map((blog) => (
         <Blog key={blog.id} blog={blog} />
       ))}
