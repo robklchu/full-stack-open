@@ -9,6 +9,9 @@ const App = () => {
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState(null);
   const [blogs, setBlogs] = useState([]);
+  const [title, setTitle] = useState("");
+  const [author, setAuthor] = useState("");
+  const [url, setUrl] = useState("");
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem("loggedBlogappUser");
@@ -29,9 +32,8 @@ const App = () => {
         username,
         password,
       });
-
       window.localStorage.setItem("loggedBlogappUser", JSON.stringify(user));
-
+      blogService.setToken(user.token);
       setUser(user);
     } catch (exception) {
       setErrorMessage("Wrong credentials");
@@ -77,6 +79,66 @@ const App = () => {
     );
   }
 
+  function blogForm() {
+    return (
+      <form onSubmit={addBlog}>
+        <div>
+          <label htmlFor="title">title:</label>
+          <input
+            type="text"
+            id="title"
+            name="title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+        </div>
+        <div>
+          <label htmlFor="author">author:</label>
+          <input
+            type="text"
+            id="author"
+            name="author"
+            value={author}
+            onChange={(e) => setAuthor(e.target.value)}
+          />
+        </div>
+        <div>
+          <label htmlFor="url">url:</label>
+          <input
+            type="text"
+            id="url"
+            name="url"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+          />
+        </div>
+        <button type="submit">create</button>
+      </form>
+    );
+  }
+
+  async function addBlog(event) {
+    event.preventDefault();
+
+    try {
+      const newBlog = await blogService.create({
+        title,
+        author,
+        url,
+      });
+      setBlogs(blogs.concat(newBlog));
+    } catch (exception) {
+      setErrorMessage("Missing title or url");
+      setTimeout(() => {
+        setErrorMessage(null);
+      }, 5000);
+    } finally {
+      setTitle("");
+      setAuthor("");
+      setUrl("");
+    }
+  }
+
   if (user === null) {
     return (
       <div>
@@ -92,8 +154,13 @@ const App = () => {
       <h2>blogs</h2>
       <p>
         {user.name} logged in
-        <button type="submit" onClick={handleLogout}>logout</button>
+        <button type="submit" onClick={handleLogout}>
+          logout
+        </button>
       </p>
+      <p style={{ color: "red" }}>{errorMessage}</p>
+      <h2>create new</h2>
+      {blogForm()}
       {blogs.map((blog) => (
         <Blog key={blog.id} blog={blog} />
       ))}
