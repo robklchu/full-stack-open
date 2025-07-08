@@ -13,9 +13,6 @@ const App = () => {
   const [isError, setIsError] = useState(false);
   const [message, setMessage] = useState(null);
   const [blogs, setBlogs] = useState([]);
-  const [title, setTitle] = useState("");
-  const [author, setAuthor] = useState("");
-  const [url, setUrl] = useState("");
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem("loggedBlogappUser");
@@ -88,29 +85,15 @@ const App = () => {
 
   function blogForm() {
     return (
-      <Togglable buttonlabel="new note">
-        <BlogForm
-          title={title}
-          author={author}
-          url={url}
-          handleSubmit={addBlog}
-          handleTitleChange={(e) => setTitle(e.target.value)}
-          handleAuthorChange={(e) => setAuthor(e.target.value)}
-          handleUrlChange={(e) => setUrl(e.target.value)}
-        />
+      <Togglable buttonlabel="create new blog">
+        <BlogForm createBlog={addBlog} />
       </Togglable>
     );
   }
 
-  async function addBlog(event) {
-    event.preventDefault();
-
+  async function addBlog(blogObject) {
     try {
-      const newBlog = await blogService.create({
-        title,
-        author,
-        url,
-      });
+      const newBlog = await blogService.create(blogObject);
       setMessage(`a new blog ${newBlog.title} added`);
       setBlogs(blogs.concat(newBlog));
     } catch (exception) {
@@ -121,9 +104,6 @@ const App = () => {
         setIsError(false);
         setMessage(null);
       }, 5000);
-      setTitle("");
-      setAuthor("");
-      setUrl("");
     }
   }
 

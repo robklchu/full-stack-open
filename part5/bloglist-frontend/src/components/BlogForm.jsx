@@ -1,17 +1,41 @@
-function BlogForm({
-  title,
-  author,
-  url,
-  handleSubmit,
-  handleTitleChange,
-  handleAuthorChange,
-  handleUrlChange,
-}) {
+import { useState } from "react";
+
+function BlogForm({ createBlog }) {
+  const [title, setTitle] = useState("");
+  const [author, setAuthor] = useState("");
+  const [url, setUrl] = useState("");
+
+  function handleTitleChange(event) {
+    setTitle(event.target.value);
+  }
+
+  function handleAuthorChange(event) {
+    setAuthor(event.target.value);
+  }
+
+  function handleUrlChange(event) {
+    setUrl(event.target.value);
+  }
+
+  async function addBlog(event) {
+    event.preventDefault();
+
+    const blogObject = {
+      title,
+      author,
+      url,
+    };
+    createBlog(blogObject);
+    setTitle("");
+    setAuthor("");
+    setUrl("");
+  }
+
   return (
     <div>
       <h2>create new</h2>
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={addBlog}>
         <div>
           <label htmlFor="title">title:</label>
           <input
