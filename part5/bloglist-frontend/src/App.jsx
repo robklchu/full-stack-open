@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import Blog from "./components/Blog";
 import Notification from "./components/Notification";
+import Togglable from "./components/Togglable";
+import BlogForm from "./components/BlogForm";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
 
@@ -86,39 +88,17 @@ const App = () => {
 
   function blogForm() {
     return (
-      <form onSubmit={addBlog}>
-        <div>
-          <label htmlFor="title">title:</label>
-          <input
-            type="text"
-            id="title"
-            name="title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="author">author:</label>
-          <input
-            type="text"
-            id="author"
-            name="author"
-            value={author}
-            onChange={(e) => setAuthor(e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="url">url:</label>
-          <input
-            type="text"
-            id="url"
-            name="url"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-          />
-        </div>
-        <button type="submit">create</button>
-      </form>
+      <Togglable buttonlabel="new note">
+        <BlogForm
+          title={title}
+          author={author}
+          url={url}
+          handleSubmit={addBlog}
+          handleTitleChange={(e) => setTitle(e.target.value)}
+          handleAuthorChange={(e) => setAuthor(e.target.value)}
+          handleUrlChange={(e) => setUrl(e.target.value)}
+        />
+      </Togglable>
     );
   }
 
@@ -167,8 +147,9 @@ const App = () => {
           logout
         </button>
       </p>
-      <h2>create new</h2>
+
       {blogForm()}
+
       {blogs.map((blog) => (
         <Blog key={blog.id} blog={blog} />
       ))}
