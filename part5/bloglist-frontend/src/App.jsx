@@ -122,6 +122,13 @@ const App = () => {
     setBlogs(sortBlogsByLikes(blogs));
   }
 
+  async function deleteBlog(blogId) {
+    await blogService.remove(blogId);
+
+    const blogs = await blogService.getAll();
+    setBlogs(sortBlogsByLikes(blogs));
+  }
+
   if (user === null) {
     return (
       <div>
@@ -146,7 +153,13 @@ const App = () => {
       {blogForm()}
 
       {blogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} incrLikes={addLikes} />
+        <Blog
+          key={blog.id}
+          blog={blog}
+          user={user}
+          incrLikes={addLikes}
+          removeBlog={deleteBlog}
+        />
       ))}
     </div>
   );

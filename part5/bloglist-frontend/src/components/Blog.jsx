@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-function Blog({ blog, incrLikes }) {
+function Blog({ blog, user, incrLikes, removeBlog }) {
   const [view, setView] = useState(false);
   const buttonlabel = view ? "hide" : "view";
 
@@ -9,6 +9,7 @@ function Blog({ blog, incrLikes }) {
   }
 
   function showBlog() {
+    const isLoggedInUser = user.username === blog.user.username;
     return (
       <div>
         <div>{blog.url}</div>
@@ -17,6 +18,14 @@ function Blog({ blog, incrLikes }) {
           <button onClick={addLikes}>likes</button>
         </div>
         <div>{blog.user.name}</div>
+        {isLoggedInUser && (
+          <button
+            onClick={deleteBlog}
+            style={{ color: "white", backgroundColor: "blue" }}
+          >
+            remove
+          </button>
+        )}
       </div>
     );
   }
@@ -25,6 +34,13 @@ function Blog({ blog, incrLikes }) {
     const updatedBlog = { ...blog, user: blog.user.id, likes: blog.likes + 1 };
     delete updatedBlog.id;
     await incrLikes(blog.id, updatedBlog);
+  }
+
+  async function deleteBlog() {
+    const decision = window.confirm(`Remove ${blog.title}`);
+    if (decision) {
+      await removeBlog(blog.id);
+    }
   }
 
   const blogStyle = {
