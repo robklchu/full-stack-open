@@ -16,7 +16,7 @@ function Blog({ blog, incrLikes }) {
           {blog.likes}
           <button onClick={addLikes}>likes</button>
         </div>
-        <div>{blog.author}</div>
+        <div>{blog.user.name}</div>
       </div>
     );
   }
