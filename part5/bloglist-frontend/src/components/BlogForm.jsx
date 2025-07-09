@@ -25,7 +25,7 @@ function BlogForm({ createBlog }) {
       author,
       url,
     };
-    createBlog(blogObject);
+    await createBlog(blogObject);
     setTitle("");
     setAuthor("");
     setUrl("");
