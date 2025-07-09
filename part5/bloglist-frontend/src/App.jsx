@@ -24,8 +24,14 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs));
+    blogService.getAll().then((blogs) => setBlogs(sortBlogsByLikes(blogs)));
   }, []);
+
+  function sortBlogsByLikes(blogs) {
+    const sortedBlogs = [...blogs];
+    sortedBlogs.sort((a, b) => b.likes - a.likes);
+    return sortedBlogs;
+  }
 
   async function handleLogin(event) {
     event.preventDefault();
@@ -95,7 +101,9 @@ const App = () => {
     try {
       const newBlog = await blogService.create(blogObject);
       setMessage(`a new blog ${newBlog.title} added`);
-      setBlogs(blogs.concat(newBlog));
+
+      const blogs = await blogService.getAll();
+      setBlogs(sortBlogsByLikes(blogs));
     } catch (exception) {
       setIsError(true);
       setMessage("Missing title or url");
@@ -111,7 +119,7 @@ const App = () => {
     await blogService.update(blogId, blogObject);
 
     const blogs = await blogService.getAll();
-    setBlogs(blogs);
+    setBlogs(sortBlogsByLikes(blogs));
   }
 
   if (user === null) {
