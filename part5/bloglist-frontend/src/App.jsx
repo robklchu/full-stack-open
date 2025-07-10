@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Blog from "./components/Blog";
 import Notification from "./components/Notification";
 import Togglable from "./components/Togglable";
@@ -89,9 +89,11 @@ const App = () => {
     );
   }
 
+  const blogFormRef = useRef(null);
+
   function blogForm() {
     return (
-      <Togglable buttonlabel="create new blog">
+      <Togglable buttonLabel="create new blog" ref={blogFormRef}>
         <BlogForm createBlog={addBlog} />
       </Togglable>
     );
@@ -99,6 +101,7 @@ const App = () => {
 
   async function addBlog(blogObject) {
     try {
+      blogFormRef.current.toggleVisibility();
       const newBlog = await blogService.create(blogObject);
       setMessage(`a new blog ${newBlog.title} added`);
 
