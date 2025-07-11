@@ -33,7 +33,7 @@ describe("<Blog />", () => {
   });
 
   test("renders url and likes when view button is clicked", async () => {
-    const { container } = render(<Blog blog={blog} user={user}/>);
+    const { container } = render(<Blog blog={blog} user={user} />);
 
     const tester = userEvent.setup();
     const viewButton = screen.getByText("view");
@@ -42,5 +42,21 @@ describe("<Blog />", () => {
     const div = container.querySelector(".detail-view");
     expect(div).toHaveTextContent(`${blog.url}`);
     expect(div).toHaveTextContent(`${blog.likes}`);
+  });
+
+  test("calls click event handler twice when likes button is clicked twice", async () => {
+    const mockHandler = vi.fn();
+
+    render(<Blog blog={blog} user={user} incrLikes={mockHandler} />);
+
+    const tester = userEvent.setup();
+    const viewButton = screen.getByText("view");
+    await tester.click(viewButton);
+
+    const likesButton = screen.getByText("likes");
+    await tester.click(likesButton);
+    await tester.click(likesButton);
+
+    expect(mockHandler.mock.calls).toHaveLength(2);
   });
 });
