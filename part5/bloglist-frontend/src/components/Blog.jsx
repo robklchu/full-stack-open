@@ -11,7 +11,7 @@ function Blog({ blog, user, incrLikes, removeBlog }) {
   function showBlog() {
     const isLoggedInUser = user.username === blog.user.username;
     return (
-      <div>
+      <div className="detail-view">
         <div>{blog.url}</div>
         <div>
           {blog.likes}
