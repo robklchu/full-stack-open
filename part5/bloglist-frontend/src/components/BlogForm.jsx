@@ -43,6 +43,7 @@ function BlogForm({ createBlog }) {
             id="title"
             name="title"
             value={title}
+            placeholder="type blog title here"
             onChange={handleTitleChange}
           />
         </div>
@@ -53,6 +54,7 @@ function BlogForm({ createBlog }) {
             id="author"
             name="author"
             value={author}
+            placeholder="type blog author name here"
             onChange={handleAuthorChange}
           />
         </div>
@@ -63,6 +65,7 @@ function BlogForm({ createBlog }) {
             id="url"
             name="url"
             value={url}
+            placeholder="type blog url here"
             onChange={handleUrlChange}
           />
         </div>
