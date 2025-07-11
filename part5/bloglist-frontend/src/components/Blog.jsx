@@ -53,7 +53,7 @@ function Blog({ blog, user, incrLikes, removeBlog }) {
 
   return (
     <div style={blogStyle}>
-      <div>
+      <div className="default-view">
         {blog.title} {blog.author}
         <button onClick={viewBlog}>{buttonlabel}</button>
       </div>
