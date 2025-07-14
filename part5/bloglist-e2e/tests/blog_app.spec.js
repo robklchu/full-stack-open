@@ -42,5 +42,26 @@ describe("Blog app", () => {
 
       await expect(page.getByText("Testing Tester")).toBeVisible();
     });
+
+    describe("and a blog exists", () => {
+      beforeEach(async ({ page }) => {
+        await createBlog(
+          page,
+          "Another new blog",
+          "Blogger",
+          "http://new-blog.org"
+        );
+      });
+
+      test("the blog can be liked", async ({ page }) => {
+        await page
+          .getByText("Another new blog")
+          .getByRole("button", { name: "view" })
+          .click();
+        await page.getByRole("button", { name: "likes" }).click();
+
+        await expect(page.getByText("1")).toBeVisible();
+      });
+    });
   });
 });
