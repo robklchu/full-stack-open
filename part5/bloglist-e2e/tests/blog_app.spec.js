@@ -62,6 +62,23 @@ describe("Blog app", () => {
 
         await expect(page.getByText("1")).toBeVisible();
       });
+
+      test("the blog can be deleted by the user who added it", async ({
+        page,
+      }) => {
+        await expect(page.getByText("Another new blog Blogger")).toBeVisible();
+
+        await page
+          .getByText("Another new blog")
+          .getByRole("button", { name: "view" })
+          .click();
+        page.on("dialog", async (dialog) => await dialog.accept());
+        await page.getByRole("button", { name: "remove" }).click();
+
+        await expect(
+          page.getByText("Another new blog Blogger")
+        ).not.toBeVisible();
+      });
     });
   });
 });
