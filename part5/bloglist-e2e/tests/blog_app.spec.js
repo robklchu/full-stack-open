@@ -102,5 +102,72 @@ describe("Blog app", () => {
         ).not.toBeVisible();
       });
     });
+
+    describe("and several blogs exist", () => {
+      beforeEach(async ({ page }) => {
+        await createBlog(
+          page,
+          "First blog",
+          "Blogger",
+          "http://first-blog.org"
+        );
+        await createBlog(
+          page,
+          "Second blog",
+          "Blogger",
+          "http://second-blog.org"
+        );
+        await createBlog(
+          page,
+          "Third blog",
+          "Blogger",
+          "http://third-blog.org"
+        );
+      });
+
+      test("first blog is on top", async ({ page }) => {
+        const blogList = await page.locator(".default-view").all();
+
+        await expect(blogList[0].getByText("First blog")).toBeVisible();
+      });
+
+      test("the blogs are arranged in descending order of likes", async ({
+        page,
+      }) => {
+        // second blog with 2 likes
+        await page
+          .getByText("Second blog")
+          .getByRole("button", { name: "view" })
+          .click();
+        const secondBlogDetail = page
+          .getByText("http://second-blog.org")
+          .locator("..");
+        await secondBlogDetail.getByRole("button", { name: "likes" }).click();
+        await secondBlogDetail.getByText('1').waitFor();
+        await secondBlogDetail.getByRole("button", { name: "likes" }).click();
+        await secondBlogDetail.getByText('2').waitFor();
+        
+        // third blog with 3 likes
+        await page
+        .getByText("Third blog")
+        .getByRole("button", { name: "view" })
+        .click(); 
+        const thirdBlogDetail = page
+        .getByText("http://third-blog.org")
+        .locator("..");
+        await thirdBlogDetail.getByRole("button", { name: "likes" }).click();
+        await thirdBlogDetail.getByText('1').waitFor();
+        await thirdBlogDetail.getByRole("button", { name: "likes" }).click();
+        await thirdBlogDetail.getByText('2').waitFor();
+        await thirdBlogDetail.getByRole("button", { name: "likes" }).click();
+        await thirdBlogDetail.getByText('3').waitFor();
+
+        const blogList = await page.locator(".default-view").all();
+
+        await expect(blogList[0].getByText("Third blog")).toBeVisible();
+        await expect(blogList[1].getByText("Second blog")).toBeVisible();
+        await expect(blogList[2].getByText("First blog")).toBeVisible();
+      });
+    });
   });
 });

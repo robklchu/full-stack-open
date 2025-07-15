@@ -10,4 +10,5 @@ export async function createBlog(page, title, author, url) {
   await page.getByPlaceholder(/\bauthor\b/).fill(author);
   await page.getByPlaceholder(/\burl\b/).fill(url);
   await page.getByRole("button", { name: "create" }).click();
+  await page.getByText(`${title} ${author}`).waitFor();
 }
