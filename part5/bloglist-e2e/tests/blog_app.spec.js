@@ -11,6 +11,13 @@ describe("Blog app", () => {
         password: "hehehaha",
       },
     });
+    await request.post("/api/users", {
+      data: {
+        name: "Matti Luukkainen",
+        username: "mluukkai",
+        password: "salainen",
+      },
+    });
     await page.goto("/");
   });
 
@@ -77,6 +84,21 @@ describe("Blog app", () => {
 
         await expect(
           page.getByText("Another new blog Blogger")
+        ).not.toBeVisible();
+      });
+
+      test("the user who didn't add the blog cannot see its 'remove' button", async ({
+        page,
+      }) => {
+        await page.getByRole("button", { name: "logout" }).click();
+        await loginWith(page, "mluukkai", "salainen");
+        await page
+          .getByText("Another new blog")
+          .getByRole("button", { name: "view" })
+          .click();
+
+        await expect(
+          page.getByRole("button", { name: "remove" })
         ).not.toBeVisible();
       });
     });
